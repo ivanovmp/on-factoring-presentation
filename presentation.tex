@@ -1,0 +1,445 @@
+\documentclass[14pt]{beamer}
+\usepackage[cp1251]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{amsmath,amssymb,stackrel}
+\title{Факторизация натуральных чисел}
+\author{Михаил Иванов}
+\subject{Theoretical Computer Science}
+\def\P{\mathbb P}
+\def\N{\mathbb N}
+\def\O{\mathcal O}
+\def\Z{\mathbb Z}
+\def\nequiv{\not\equiv}
+\def\phs#1{\left(#1\right)}
+\def\brc#1{\left[#1\right]}
+\def\fig#1{\left\{#1\right\}}
+\newcommand*{\hm}[1]{#1\nobreak\discretionary{}%
+{\hbox{$\mathsurround=0pt #1$}}{}}
+\def\eps{\varepsilon}
+\def\le{\leqslant}
+\def\ge{\geqslant}
+\def\Const{\mathrm{Const}}
+\def\kr{\mathrel{\vdots}}
+\DeclareMathOperator\lcm{lcm}
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+%\begin{frame}{Outline}
+%  \tableofcontents
+%  % You might wish to add the option [pausesections]
+%\end{frame}
+
+
+% Since this a solution template for a generic talk, very little can
+% be said about how it should be structured. However, the talk length
+% of between 15min and 45min and the theme suggest that you stick to
+% the following rules:  
+
+% - Exactly two or three sections (other than the summary).
+% - At *most* three subsections per section.
+% - Talk about 30s to 2min per frame. So there should be between about
+%   15 and 30 frames, all told.
+
+\section{Факторизация и тест простоты}
+
+\begin{frame}{Факторизация и тест простоты}{Центральные множества}
+	\begin{itemize}
+		\item $\N=\{1,2,3,4,5\ldots\}$
+		\item $\P=\{2,3,5,7,11,\ldots\}$
+	\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Факторизация и тест простоты}{Основные задачи}
+	\begin{itemize}
+		\item $n\in\N\setminus\{1\}$
+		\item Тест непростоты: $n\notin\P$
+		\item Переформулировка: $\exists n_1,n_2\in\{2,\ldots,n-1\}\colon n=n_1n_2$
+		\item Факторизация: $\text{найти }p_1,\ldots,p_k\in\P\colon n=\prod\limits_{i=1}^k{p_i}$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Факторизация и тест простоты}{Сведение}
+	\begin{itemize}
+		\item $\text{тест простоты}\to\text{факторизация}$
+		\item $n\in\P\hm\Longleftrightarrow\phs{p_1,\ldots,p_k\in\P\colon n=\prod\limits_{i=1}^k{p_i}\Rightarrow k=1}$
+		\item Обязательно ли факторизовывать?
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Факторизация и тест простоты}{Отсутствие необходимости факторизации}
+	\begin{itemize}
+		\item Малая теорема Ферма: если $n\in\P$, $a\stackrel[n]{}{\nequiv}0$, то $a^{n-1}\stackrel[n]{}{\equiv}1$
+		\item Возьмём много случайных $a$ и проверим это
+		\item $a^{n-1}$ вычисляется двоичным возведением в степень
+		\item Победа?
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Факторизация и тест простоты}{Тест Ферма не работает}
+	\begin{itemize}
+		\item Не победа
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Факторизация и тест простоты}{Числа Кармайкла}
+	\begin{itemize}
+		\item Описанная процедура называется \textit{тестом Ферма}
+		\item Число Кармайкла~--- $n$, такое что $n\notin\P\wedge(a,n)\equiv1\Longleftrightarrow a^{n-1}\stackrel[n]{}{\equiv}1$
+		\item На числах Кармайкла тест Ферма не работает
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Факторизация и тест простоты}{Тест Миллера-Рабина}
+	\begin{itemize}
+		\item Действуем аккуратнее
+		\item $x^2\stackrel[n]{}{\equiv}1\Rightarrow x\in\{-1_n,1_n\}$ только при $n\in\{1\}\cup\P$
+		\item Пусть $n-1=2^km$
+		\item Малая теорема Ферма: если $n\in\P$, $a\stackrel[n]{}{\nequiv}0$, то $a^{n-1}\stackrel[n]{}{\equiv}1$
+		\item Малая теорема Ферма: если $n\in\P$, $a\stackrel[n]{}{\nequiv}0$, то $\phs{a^m}^{2^k}\stackrel[n]{}{\equiv}1$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Факторизация и тест простоты}{Тест Миллера-Рабина}
+	\begin{itemize}
+		\item Найдём $a^m,\phs{a^m}^2,\phs{a^m}^4,\phs{a^m}^8,\ldots,\phs{a^m}^{2^k}$
+		\item Если в конце не получилось $1$, то $n\notin\P$
+		\item Рассмотрим первый момент, когда получилось $1$
+		\item Если это $\phs{a^m}^{2^t}$, $t>0$, посмотрим на шаг назад
+		\item Если $\phs{a^m}^{2^{t-1}}\stackrel[n]{}{\nequiv}-1$, то $n\notin\P$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Факторизация и тест простоты}{Тест простоты лежит в классе P}
+	\begin{itemize}
+		\item Для составных $n$ случайное $a$ обнаружит непростоту с вероятностью $75\%$
+		\item Одна итерация работает за $\O\phs{\log^2 n\log\log n\log\log\log n}$
+		\item Рандомизированно $\O\phs{\log^3 n}$
+		\item Тест Агравала~--- Каяла~--- Саксены (2004), модификация Ленстры и Померанса (2005)~--- детерминированно $\O\phs{\log^6}$
+		\item Тест простоты имеет полиномиальную сложность (от длины числа на входе)
+	\end{itemize}
+\end{frame}
+
+\section{Факторизация}
+\begin{frame}{Факторизация}{Нахождение нетривиального делителя}
+	\begin{itemize}
+		\item Вернёмся к факторизации
+		\item $\text{Ищем }p_1,\ldots,p_k\in\P\colon n=\prod\limits_{i=1}^k{p_i}$
+		\item Пусть $n\notin\P$ умеем представлять в виде $n_1n_2$, $n_1,n_2\in\{2,\ldots,n-1\}$
+		\item Процедура факторизации рекурсивна:
+		\begin{itemize}
+			\item Если $n$ простое, вернуть $n$
+			\item Иначе представить $n=n_1n_2$
+			\item Рекурсивно представить $n_1=\prod\limits_{i=1}^k{p_i}$, $n_2=\prod\limits_{i=k+1}^\ell{p_i}$
+			\item Склеить: $n=\prod\limits_{i=1}^\ell{p_i}$
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Факторизация}{Тривиальные алгоритмы}
+	\begin{itemize}
+		\item Достаточно научиться находить нетривиальный делитель у составного числа
+		\item $\O(n)$: перебрать $n_1\in\{2,3,\ldots,n-1\}$, проверить $n_2=\frac n{n_1}\in\N$
+		\item $\O\phs{\sqrt n}$: так как $\min\phs{n_1,n_2}\le\sqrt n$, перебрать $n_1\in\{2,3,\ldots,\left[\sqrt n\right]\}$, проверить $n_2=\frac n{n_1}\in\N$
+		\item $\O\phs{\sqrt[4]n\log n}$~--- $\rho$-алгоритм Полларда
+	\end{itemize}
+\end{frame}
+
+\section{$\rho$-алгоритм Полларда}
+\begin{frame}{$\rho$-алгоритм Полларда}{Парадокс дней рождения}
+	\begin{itemize}
+		\item $C$ детей в классе, $D$ дней в году, $C\ll D$
+		\item $D^C$ способов
+		\item $D(D-1)\ldots(D-C+1)$ способов с разными днями
+		\item $\P\fig{\text{разных дней рождения}}=\frac{D(D-1)\ldots(D-C+1)}{D^C}$
+		\item $1\phs{1-\frac1D}\ldots\phs{1-\frac{C-1}D}<\eps$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{$\rho$-алгоритм Полларда}{Продолжение парадокса дней рождения}
+	\begin{itemize}
+		\item $\ln{1\phs{1-\frac1D}\ldots\phs{1-\frac{C-1}D}}<\ln\eps$
+		\item $\sum\limits_{i=0}^{C-1}{\ln\phs{1-\frac iD}}<-E$
+		\begin{itemize}
+			\item $\ln(1+x)\approx x$
+		\end{itemize}
+		\item $\sum\limits_{i=0}^{C-1}{-\frac iD}<-E$
+		\begin{itemize}
+			\item $\sum\limits_{i=0}^{n-1}{i}\approx\frac{n^2}2$
+		\end{itemize}
+		\item $-\frac{C^2}{2D}<-E$
+		\item $C>\sqrt{2DE}$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{$\rho$-алгоритм Полларда}{Применение к факторизации, метод за $\O\phs{\sqrt n\log n}$}
+	\begin{itemize}
+		\item $n=n_1n_2$, $n_1\le\sqrt n\le n_2$
+		\item Рассмотрим случайные $a_1,\ldots,a_C$
+		\item Пусть $D=n_1$
+		\item $a_1,\ldots,a_C$~--- <<дети>> с днями рождения $a_i\mod D$ среди $\{0,1,\ldots,D-1\}$
+		\item Если $C\approx\sqrt{\Const D}\le\sqrt[4]n$, то есть ${a_i\mod D=a_j\mod D}$
+		\item $\phs{a_i-a_j,n}$ кратно $D$.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{$\rho$-алгоритм Полларда}{Применение к факторизации, метод за $\O\phs{\sqrt n\log n}$}
+	\begin{itemize}
+		\item $\P\fig{\phs{a_i-a_j,n}=n}=\frac1{n_2}<\frac1{\sqrt n}$
+		\item Итого, при достаточно большом $\Const$ число $\phs{a_i-a_j,n}$ с большой вероятностью~--- нетривиальный делитель $n$
+		\item Алгоритм Евклида~--- $\O(\log n)$
+		\item $\forall i,j$ сравнить $\phs{a_i-a_j,n}$ с 1 и $n$
+		\item $\O\phs{\sqrt n\log n}$~--- медленно
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{$\rho$-алгоритм Полларда}{Применение к факторизации, метод за $\O\phs{\sqrt[4]n\log n}$}
+	\begin{itemize}
+		\item Не любая последовательность $\fig{a_i}_{i\in\N}$ хороша
+		\item Свойство остатков: $a_i\stackrel[n_1]{}{\equiv}a_j\Rightarrow a_{i+1}\stackrel[n_1]{}{\equiv}a_{j+1}$
+		\item Например, $a_{i+1}=f\phs{a_i}$, $f(x)=x^2+1$
+		\item Эвристика: $\fig{a_i}_{i\in\N}$ всё ещё достаточно случайна для парадокса дней рождения
+		\item Почему $\rho$-алгоритм Полларда?
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\begin{center}
+		\includegraphics[width=.9\textwidth]{Pollard_rho_cycle.ps}
+	\end{center}
+\end{frame}
+
+\begin{frame}{$\rho$-алгоритм Полларда}{Метод за $\O\phs{\sqrt[4]n\log n}$}
+	\begin{itemize}
+		\item $a_i\stackrel[n_1]{}{\equiv}a_j$ с наименьшим $j>i$
+		\item В среднем $j\approx\Const\sqrt[4]{n}$
+		\item Предпериод $P=i$, период $Q=j-i$
+		\item $P+	Q$ порядка $\Const\sqrt[4]{n}$
+		\item Хотим два элемента $a_x$, $a_y$, где $x<y$, $y-x\kr Q$, $x\ge P$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{$\rho$-алгоритм Полларда}{Метод за $\O\phs{\sqrt[4]n\log n}$}
+	\begin{itemize}
+		\item Будем брать $\phs{a_i,a_{2i}}$
+		\item $a_{i+1}=f\phs{a_i}$, $a_{2(i+1)}=f\phs{f\phs{a_{2i}}}$
+		\item Условия для $x=i,y=2i$:
+		\begin{itemize}
+			\item $x<y$: $i<2i$
+			\item $y-x\kr Q$: надо $i\kr Q$
+			\item $x\ge P$: $i\ge P$
+		\end{itemize}
+		\item Достаточно $i\in\{1,2,\ldots,P+Q\}$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{$\rho$-алгоритм Полларда}{Итоговый алгоритм}
+	\begin{itemize}
+		\item $f(x)=x^2+1$ (можно $x^2+c$, где $c$ случайное)
+		\item Инициализируем $a,b$ одинаковым случайным числом
+		\item Повторяем $\Const\sqrt[4]{n}$ раз:
+		\begin{itemize}
+			\item $a:=f(a), b:=f(f(b)), g:=(a,b)$
+			\item Если $g\notin\{1,n\}$, вернуть нетривиальный делитель~$g$
+		\end{itemize}
+		\item Повторить с другими случайными $a=b$ и $c$
+	\end{itemize}
+\end{frame}
+
+\section{$p-1$-алгоритм Полларда}
+\begin{frame}{$p-1$-алгоритм Полларда}{Идея}
+	\begin{itemize}
+		\item Опять вспомним малую теорему Ферма (сегодня без неё никуда): если $p\in\P$, $(a,p)=1$, то $a^{p-1}\stackrel[p]{}{\equiv}1$.
+		\item Следствие: если ещё и $M\kr p-1$, то $a^M\stackrel[p]{}{\equiv}1$.
+		\item Пусть $M(i)=\lcm(1,2,\ldots,i)$
+		\item Возьмём некоторое $B$ и $M=M(B)$
+		\item Если $p-1$ кратно маленьким степеням простых, то $a^M\stackrel[p]{}{\equiv}1$.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{$p-1$-алгоритм Полларда}{Алгоритм}
+	\begin{itemize}
+		\item Выбрать планку $B$
+		\item Решетом Эратосфена найти все простые $p_1\ldots,p_m\le B$ в максимальных степенях $p_i^{\alpha_i}\le B$
+		\item Для нескольких случайных $c$ повторять:
+		\begin{itemize}
+			\item Для каждого $i$ заменить $c$ на $c^{p_i^{\alpha_i}}$ ($\alpha_i$ раз возвести $c$ в степень $p_i$)
+			\item $g:=(c-1,n)$
+			\item Если $g\notin\{1,n\}$, вернуть нетривиальный делитель~$g$
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{$p-1$-алгоритм Полларда}{Хитрости}
+	\begin{itemize}
+		\item Если для всех $p$, делящих $n$, $p-1$ кратно маленьким степеням простых, то $g$ будет равно $n$
+		\item Брать нечётное ядро $M(B)$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{$p-1$-алгоритм Полларда}{Вторая фаза}
+	\begin{itemize}
+		\item Если для всех $p$, делящих $n$, $p-1$ кратно большим степеням простых, то $g$ будет равно 1
+		\item Нужна вторая фаза
+		\item Рассмотрим $B'\approx B\ln B$
+		\item Пусть $Q_1<Q_2<\ldots<Q_t$~--- все простые в $\phs{B;B'}$
+		\item Пробуем $M_i=Q_iM(B)$ 
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{$p-1$-алгоритм Полларда}{Перебор всех $M_i$}
+	\begin{itemize}
+		\item Чтобы перейти от $a^{M_i}$ к $a^{M_{i+1}}$, нужно домножить на $a^{M_{i+1}-M_i}$
+		\item $a^{Q_{i+1}M(B)-Q_iM(B)}$
+		\item $\phs{a^{M(B)}}^{Q_{i+1}-Q_i}$
+		\item $Q_{i+1}-Q_i$ малы
+		\item Предподсчитаем $\phs{a^{M(B)}}^e$ для малых $e$
+		\item Пересчитываем $a^{M_{i+1}}$ через $a^{M_i}$ за $\O(1)$
+		\item При $B'\approx B\ln B$ первая и вторая фаза займут равное число времени
+	\end{itemize}
+\end{frame}
+
+\section{Эллиптические кривые}
+\begin{frame}{Эллиптические кривые}{Быстрая факторизация}
+	\begin{itemize}
+		\item Всё предыдущее работало за $\O\phs{n^\alpha}$
+		\item Перепишем: за $\O\phs{e^{c\ln n}}$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Эллиптические кривые}{$L$-нотация}
+	\begin{itemize}
+		\item Обозначим $L_n[\alpha,c]=\exp{\phs{(c+o(1))\ln^\alpha n\ln^{1-\alpha}\ln n}}$ при $n\to+\infty$, $c\in(0;+\infty)$, $\alpha\in[0;1]$
+		\item Тривиальная факторизация: $L_n\brc{1,\frac12}$
+		\item $\rho$-алгоритм Полларда: $L_n\brc{1,\frac14}$
+		\item Метод Ленстры факторизации с помощью эллиптических кривых: $L_p\brc{\frac12,\sqrt2}$, где $p$~--- наименьший простой делитель $n$
+		\item С помощью оценки $p\le\sqrt n$: $L_n\brc{\frac12,1}$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Эллиптические кривые}{Эллиптические кривые}
+	\begin{itemize}
+		\item Пусть $F$~--- кубический многочлен от двух переменных (формально, кубический однородный от трёх, не кратный $z$)
+		\item Проективная плоскость~--- множество $(x,y,z)$, $x^2+y^2+z^2\ne0$, с точностью до домножения
+		\item $F(x,y)=0$~--- кривая $\Gamma$ на проективной плоскости
+		\item Предположим, что класса $C^\infty$ (без самопересечений и точек с нулевой производной)
+		\item Тогда кривая называется эллиптической
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Эллиптические кривые}{Эллиптические кривые}
+	\begin{itemize}
+		\item После проективного преобразования:
+		\item $F(x,y)=y^2-\phs{x^3+ax+b}$
+		\item Заведём операцию $+$ на кривой:
+		\begin{itemize}
+			\item коммутативная
+			\item ассоциативная
+			\item $a+b+c=0$ для коллинеарных точек
+		\end{itemize}
+		\item Заведём операцию $-$, противоположную $+$
+		\item Получилась абелева группа
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Эллиптические кривые}{Умножение}
+	\begin{itemize}
+		\item Заведём операцию $[n]a$, $n\in\N_0$, $a\in\Gamma$~--- умножение на целое
+		\item Бинарное умножение:
+		\begin{itemize}
+			\item $n\kr2\Rightarrow[n]a=\brc{\frac n2}a+\brc{\frac n2}a$
+			\item иначе $[n]a=\brc{\frac{n-1}2}a+\brc{\frac{n-1}2}a+a$
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Эллиптические кривые}{Эллиптическая псевдокривая}
+	\begin{itemize}
+		\item Определим всё сказанное в кольце $\Z_n$
+		\item $(n,6)=1$, $\phs{4a^3+27b^2,n}=1$, $E_{a,b}\phs{\Z_n}=\fig{(x,y)\in\Z_n\times\Z_n\mid y^2=x^3+ax+b}\cup\{\infty\}$
+		\item Будем выполнять некоторые операции
+		\item Если произойдёт что-то странное (пытаемся попасть в бесконечно удалённую точку относительно нетривиального делителя $n$, но не относительно $n$), то только во время деления на некоторое $a$
+		\item $(a,n)\notin\{1,n\}$
+		\item Можно сразу прекращать и возвращать делитель
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Эллиптические кривые}{Метод Ленстры. Начало}
+	\begin{itemize}
+		\item Проверить, не является ли $n$ точной степенью
+		\item Выбрать планку $B_1$
+		\item Выбрать случайную точку $(x,y)\in\fig{(x,y)\in\Z_n\times\Z_n}$
+		\item Выбрать случайный параметр $a\in\Z_n$
+		\item Получилась случайная эллиптическая кривая: $b=y^2-x^3-ax\mod n$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Эллиптические кривые}{Валидация кривой}
+	\begin{itemize}
+		\item $g=\phs{4a^3+27b^2,n}$
+		\item Если $g=n$, то вернуться на предыдущий слайд
+		\item Если $g\in\{2,\ldots,n-1\}$, нашли нетривиальный делитель
+		\item Если $g=1$, зафиксируем кривую $E=E_{a,b}\phs{Z_n}$ и точку $P=(x,y)$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Эллиптические кривые}{Попытка сломать эллиптическую арифметику}
+	\begin{itemize}
+		\item Перебираем $p\in\P$, $p\le B_1$
+		\begin{itemize}
+			\item Пусть $\alpha$~--- наибольшая степень, что $p^\alpha\le B_1$
+			\item Заменим $P$ на $\brc{p^\alpha}P$ ($\alpha$ раз умножим $P$ на $p$)
+			\item Возвращаем нетривиальный делитель, если какое-то эллиптическое сложение не удалось
+		\end{itemize}
+		\item Если ничего не нашлось, ищем другую случайную кривую (возможно, с увеличением планки)
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Эллиптические кривые}{Оценка сложности}
+	\begin{itemize}
+		\item Пусть $p<q$~--- два наименьших простых делителя $n$
+		\item Хотим: $[k]P=\infty$ в $E_{a,b}\phs{\Z_p}$, но $[k]P\ne\infty$ в $E_{a,b}\phs{\Z_q}$
+		\item Второе событие гораздо вероятнее, чем первое
+		\item Не будем обращать внимание на второе событие
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Эллиптические кривые}{Гладкость}
+	\begin{itemize}
+		\item $x\in\N$~--- $y$-гладкое, если все простые в $x$ не превосходят $y$
+		\item $\psi(x,y)$~--- число $y$-гладких чисел в $\{1,\ldots,x\}$
+		\item $\#E_{a,b}\phs{\Z_p}$~--- порядок эллиптической группы
+		\item Если порядок $B_1$-гладкий, разумно ожидать, что случайный элемент обнулится от умножения на $\lcm\phs{1,2,\ldots,B_1}$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\begin{itemize}
+		\item Теорема Хассе: $\#E_{a,b}\phs{\Z_p}\in\phs{p+1-2\sqrt p;p+1+2\sqrt p}$
+		\item Количество $B_1$-гладких чисел в промежутке: $\psi\phs{p+1+2\sqrt p,B_1}-\psi\phs{p+1-2\sqrt p,B_1}$
+		\item Плотность $B_1$-гладких чисел в промежутке: $\frac{\psi\phs{p+1+2\sqrt p,B_1}-\psi\phs{p+1-2\sqrt p,B_1}}{4\sqrt p}$
+		\item Теорема Ленстры: вероятность $\P\phs{B_1}$, что $\#E_{a,b}\phs{\Z_p}$ $B_1$-гладкое, не меньше $c\frac{\psi\phs{p+1+2\sqrt p,B_1}-\psi\phs{p+1-2\sqrt p,B_1}}{\sqrt p\ln p}$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\begin{itemize}
+		\item Одна попытка тратит $\O\phs{B_1}$ арифметических операций и срабатывает с вероятностью $\P\phs{B_1}\approx c\frac{\psi\phs{p+1+2\sqrt p,B_1}-\psi\phs{p+1-2\sqrt p,B_1}}{\sqrt p\ln p}$
+		\item Минимизируем $\frac{B_1}{\P\phs{B_1}}$
+		\item Минимальное число операций достигается при $B_1=\exp{\phs{\phs{\frac1{\sqrt 2}+o(1)}\sqrt{\ln p\ln\ln p}}}$
+		\item Соответствующая асимптотика $\exp{\phs{\phs{\sqrt2+o(1)}\sqrt{\ln p\ln\ln p}}}$
+		\item $L_p\brc{\frac12,\sqrt2}$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\begin{center}
+		\Huge Спасибо!
+	\end{center}
+\end{frame}
+\end{document}
+
+
